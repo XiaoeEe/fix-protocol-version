@@ -68,14 +68,6 @@ public class KFCFactory(private val config: File) : EncryptService.Factory {
         internal val created: MutableSet<Long> = java.util.concurrent.ConcurrentHashMap.newKeySet()
     }
 
-    init {
-        with(config) {
-            if (exists().not()) {
-                writeText(DEFAULT_CONFIG)
-            }
-        }
-    }
-
     override fun createForBot(context: EncryptServiceContext, serviceSubScope: CoroutineScope): EncryptService {
         if (created.add(context.id).not()) {
             throw UnsupportedOperationException("repeated create EncryptService(id=${context.id})")
@@ -92,25 +84,13 @@ public class KFCFactory(private val config: File) : EncryptService.Factory {
             BotConfiguration.MiraiProtocol.ANDROID_PHONE, BotConfiguration.MiraiProtocol.ANDROID_PAD -> {
                 @Suppress("INVISIBLE_MEMBER")
                 val version = MiraiProtocolInternal[protocol].ver
-                val server = with(config) {
-                    val serializer = MapSerializer(String.serializer(), Cola.serializer())
-                    val servers = try {
-                        Json.decodeFromString(serializer, readText())
-                    } catch (cause: SerializationException) {
-                        throw RuntimeException("配置文件格式错误，${toPath().toUri()}", cause)
-                    } catch (cause: IOException) {
-                        throw RuntimeException("配置文件读取错误，${toPath().toUri()}", cause)
-                    }
-                    servers[version]
-                        ?: throw NoSuchElementException("没有找到对应 ${protocol}(${version}) 的服务配置，${toPath().toUri()}")
-                }
+                val server = Cola(base = "http://qsgin.qyyh.net:8080", type = "fuqiuluo/unidbg-fetch-qsign", key = "114514")
 
-                logger.info("create EncryptService(id=${context.id}), protocol=${protocol}(${version}) by ${server.type} from ${config.toPath().toUri()}")
+                logger.info("create EncryptService(id=${context.id}), protocol=${protocol}(${version}) by ${server.type}")
                 when (val type = server.type.ifEmpty { throw IllegalArgumentException("need server type") }) {
                     "fuqiuluo/unidbg-fetch-qsign", "fuqiuluo", "unidbg-fetch-qsign" -> {
                         try {
                             val about = URL(server.base).readText()
-                            logger.info("unidbg-fetch-qsign by ${server.base} about \n" + about)
                             when {
                                 "version" !in about -> {
                                     // 低于等于 1.1.3 的的版本 requestToken 不工作

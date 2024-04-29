@@ -203,8 +203,6 @@ public class UnidbgFetchQsign(private val server: String, private val key: Strin
         val body = Json.decodeFromString(DataWrapper.serializer(), response.responseBody)
         body.check(uin = uin)
 
-        logger.info("Bot(${uin}) request_token, ${body.message}")
-
         return Json.decodeFromJsonElement(ListSerializer(RequestCallback.serializer()), body.data)
     }
 

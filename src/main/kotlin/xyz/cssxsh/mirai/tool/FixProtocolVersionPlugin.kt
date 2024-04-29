@@ -26,7 +26,7 @@ internal object FixProtocolVersionPlugin : KotlinPlugin(
                 val file = File("${protocol.name.lowercase()}.json")
                 if (file.exists()) {
                     logger.info("$protocol load from \n ${file.toPath().toUri()}")
-                    FixProtocolVersion.load(protocol, file)
+                    FixProtocolVersion.load(protocol)
                 }
             }
         } catch (cause: Throwable) {

@@ -331,25 +331,32 @@ public object FixProtocolVersion {
     public val CONFIG_PATH_PROPERTY: String = "xyz.cssxsh.mirai.tool.FixProtocolVersion.folder"
     
     /**
-     * 从本地加载协议
+     * 加载协议
      *
      * @since 1.8.0
      */
     @JvmStatic
     public fun load(protocol: BotConfiguration.MiraiProtocol) {
-        val prefix = System.getProperty(CONFIG_PATH_PROPERTY, ".")
-        val file = File(prefix, "${protocol.name.lowercase()}.json")
-        load(protocol = protocol, file = file)
-    }
-
-    /**
-     * 从自定义文件加载协议
-     *
-     * @since 1.12.0
-     */
-    @JvmStatic
-    public fun load(protocol: BotConfiguration.MiraiProtocol, file: File) {
-        val json: JsonObject = Json.parseToJsonElement(file.readText()).jsonObject
+        val json: JsonObject = Json.parseToJsonElement("""
+        {
+          "apk_id": "com.tencent.mobileqq",
+          "app_id": 537164888,
+          "sub_app_id": 537164888,
+          "app_key": "0S200MNJT807V3GE",
+          "sort_version_name": "8.9.63.11390",
+          "build_time": 1685069178,
+          "apk_sign": "a6b745bf24a2c277527716f6f36eb68d",
+          "sdk_version": "6.0.0.2546",
+          "sso_version": 20,
+          "misc_bitmap": 150470524,
+          "main_sig_map": 34869472,
+          "sub_sig_map": 66560,
+          "dump_time": 1687796862,
+          "qua": "V1_AND_SQ_8.9.63_4194_YYB_D",
+          "protocol_type": 6
+        }
+        """.trimIndent()
+        ).jsonObject
 
         store(protocol, json)
     }
